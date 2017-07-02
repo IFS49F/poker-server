@@ -14,12 +14,13 @@ function onConnection(socket) {
   let currentRoom = null;
 
   socket.on('join', (room, playerName) => {
-    console.log('Client ' + socket.id + ' joined...');
+    console.log('Client ' + socket.id + ' joined room ' + room + ' ...');
 
     currentRoom = room;
 
     socket.join(room, () => {
       if (!clients[room]) {
+        console.log('New room ' + room + ' created for the first client...');
         clients[room] = {
           team: [],
           show: false
@@ -39,7 +40,9 @@ function onConnection(socket) {
   });
 
   socket.on('vote', (score) => {
-    console.log('Client ' + socket.id + ' voted...');
+    if (!clients[currentRoom]) { return; }
+
+    console.log('Client ' + socket.id + ' of room ' + currentRoom + ' voted...');
 
     let votingPlayer = clients[currentRoom].team.find(item => item.id === socket.id);
 
@@ -50,7 +53,9 @@ function onConnection(socket) {
   });
 
   socket.on('show', (show) => {
-    console.log('Client ' + socket.id + ' showed the result...');
+    if (!clients[currentRoom]) { return; }
+
+    console.log('Client ' + socket.id + ' of room ' + currentRoom + ' showed the result...');
 
     clients[currentRoom].show = show;
 
@@ -58,7 +63,9 @@ function onConnection(socket) {
   });
 
   socket.on('clear', (show) => {
-    console.log('Client ' + socket.id + ' cleared the result...');
+    if (!clients[currentRoom]) { return; }
+
+    console.log('Client ' + socket.id + ' of room ' + currentRoom + ' cleared the result...');
 
     clients[currentRoom].team.forEach(item => {
       item.score = null;
@@ -70,13 +77,14 @@ function onConnection(socket) {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client ' + socket.id + ' disconnected...');
-
     if (!clients[currentRoom]) { return; }
+
+    console.log('Client ' + socket.id + ' of room ' + currentRoom + ' disconnected...');
 
     clients[currentRoom].team = clients[currentRoom].team.filter(item => item.id !== socket.id);
 
     if (clients[currentRoom].team.length === 0) {
+      console.log('All clients in disconnected, close room ' + currentRoom);
       delete clients[currentRoom];
     }
 
