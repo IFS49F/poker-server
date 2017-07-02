@@ -76,6 +76,10 @@ function onConnection(socket) {
 
     clients[currentRoom].team = clients[currentRoom].team.filter(item => item.id !== socket.id);
 
+    if (clients[currentRoom].team.length === 0) {
+      delete clients[currentRoom];
+    }
+
     io.in(currentRoom).emit('disconnected', clients[currentRoom]);
   })
 }
