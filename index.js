@@ -3,12 +3,15 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const Redis = require('ioredis');
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const port = process.env.PORT || 4000;
 
 app.use(express.static(__dirname + '/public'));
 
 const ts = new Date().getTime();
-const redis = new Redis({ keyPrefix: `poker:${ts}:` });
+const redis = new Redis(redisUrl, {
+  keyPrefix: `poker:${ts}:`
+});
 
 function onConnection(socket) {
   console.log(`Client '${socket.id}' connected`);
