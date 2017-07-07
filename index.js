@@ -7,23 +7,23 @@ const port = process.env.PORT || 4000;
 
 app.use(express.static(__dirname + '/public'));
 
-let clients = {};
-let redis = new Redis();
+const ts = new Date().getTime();
+const redis = new Redis({ keyPrefix: `poker:${ts}:` });
 
 function onConnection(socket) {
-  console.log('Client ' + socket.id + ' connected...');
+  console.log(`Client '${socket.id}' connected`);
 
   let currentRoom = null;
 
   socket.on('join', (room, playerName) => {
-    console.log('Client ' + socket.id + ' joined room ' + room + ' ...');
+    console.log(`Client '${socket.id}' joined room '${room}'`);
 
     currentRoom = room;
 
-    socket.join(room, () => {
-      redis.get(room, (err, result) => {
+    socket.join(currentRoom, () => {
+      redis.get(currentRoom, (err, result) => {
         if (!result) {
-          console.log('New room ' + room + ' created for the first client...');
+          console.log(`New room '${currentRoom}' created`);
           result = {
             team: [],
             show: false
@@ -32,17 +32,29 @@ function onConnection(socket) {
           result = JSON.parse(result);
         }
 
-        result.team.push({
-          id: socket.id,
-          name: playerName,
-          score: null,
-          voted: false
-        });
-
-        redis.set(room, JSON.stringify(result));
-        // sending to all clients in room include sender
-        io.in(room).emit('joined', result);
+        redis.set(currentRoom, JSON.stringify(result));
+        io.in(currentRoom).emit('stateUpdate', result);
       });
+    });
+  });
+
+  socket.on('play', (playerName) => {
+    redis.get(currentRoom, (err, result) => {
+      if (!result) { return };
+
+      result = JSON.parse(result);
+
+      console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${playerName}'`);
+
+      result.team.push({
+        id: socket.id,
+        name: playerName,
+        score: null,
+        voted: false
+      });
+
+      redis.set(currentRoom, JSON.stringify(result));
+      io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
@@ -52,7 +64,7 @@ function onConnection(socket) {
 
       result = JSON.parse(result);
 
-      console.log('Client ' + socket.id + ' of room ' + currentRoom + ' voted...');
+      console.log(`Client '${socket.id}' of room '${currentRoom}' voted`);
 
       let votingPlayer = result.team.find(item => item.id === socket.id);
 
@@ -60,7 +72,7 @@ function onConnection(socket) {
       votingPlayer.voted = true;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('voted', result);
+      io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
@@ -70,12 +82,12 @@ function onConnection(socket) {
 
       result = JSON.parse(result);
 
-      console.log('Client ' + socket.id + ' of room ' + currentRoom + ' showed the result...');
+      console.log(`Client '${socket.id}' of room '${currentRoom}' showed the result`);
 
       result.show = show;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('voted', result);
+      io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
@@ -85,7 +97,7 @@ function onConnection(socket) {
 
       result = JSON.parse(result);
 
-      console.log('Client ' + socket.id + ' of room ' + currentRoom + ' cleared the result...');
+      console.log(`Client '${socket.id}' of room '${currentRoom}' cleared the result`);
 
       result.team.forEach(item => {
         item.score = null;
@@ -94,7 +106,7 @@ function onConnection(socket) {
       result.show = false;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('cleared', result);
+      io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
@@ -104,23 +116,23 @@ function onConnection(socket) {
 
       result = JSON.parse(result);
 
-      console.log('Client ' + socket.id + ' of room ' + currentRoom + ' disconnected...');
+      console.log(`Client '${socket.id}' of room '${currentRoom}' disconnected`);
 
       result.team = result.team.filter(item => item.id !== socket.id);
 
       if (result.team.length === 0) {
-        console.log('All clients in disconnected, close room ' + currentRoom);
+        console.log(`All clients of room '${currentRoom}' disconnected, deleting the room`);
         result = null;
         redis.del(currentRoom);
       } else {
         redis.set(currentRoom, JSON.stringify(result));
       }
 
-      io.in(currentRoom).emit('disconnected', result);
+      io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 }
 
 io.on('connection', onConnection);
 
-http.listen(port, () => console.log('listening on port ' + port));
+http.listen(port, () => console.log(`Listening on port ${port}`));

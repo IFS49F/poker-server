@@ -6,10 +6,13 @@
   "scripts": {
     "start": "nodemon index.js"
   },
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "keywords": [
     "poker"
   ],
-  "author": "",
+  "author": "Zoro Jiang <houritsunohikari@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.3",
@@ -18,5 +21,6 @@
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
-  }
+  },
+  "repository": "git@github.com:IFS49F/poker-server.git"
 }
