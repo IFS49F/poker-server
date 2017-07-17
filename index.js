@@ -80,7 +80,7 @@ function onConnection(socket) {
     });
   });
 
-  socket.on('show', (show) => {
+  socket.on('show', () => {
     redis.get(currentRoom, (err, result) => {
       if (!result) { return; }
 
@@ -88,14 +88,14 @@ function onConnection(socket) {
 
       console.log(`Client '${socket.id}' of room '${currentRoom}' showed the result`);
 
-      result.show = show;
+      result.show = true;
 
       redis.set(currentRoom, JSON.stringify(result));
       io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
-  socket.on('clear', (show) => {
+  socket.on('clear', () => {
     redis.get(currentRoom, (err, result) => {
       if (!result) { return; }
 
