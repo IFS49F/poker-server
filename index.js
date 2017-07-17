@@ -149,7 +149,7 @@ function onConnection(socket) {
         redis.set(currentRoom, JSON.stringify(result));
       }
 
-      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      socket.to(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 }
