@@ -12,6 +12,10 @@ const ts = new Date().getTime();
 const redis = new Redis(redisUrl, {
   keyPrefix: `poker:${ts}:`
 });
+const defaultState = {
+  team: [],
+  show: false
+};
 
 function onConnection(socket) {
   console.log(`Client '${socket.id}' connected`);
@@ -27,10 +31,7 @@ function onConnection(socket) {
       redis.get(currentRoom, (err, result) => {
         if (!result) {
           console.log(`New room '${currentRoom}' created`);
-          result = {
-            team: [],
-            show: false
-          }
+          result = defaultState;
         } else {
           result = JSON.parse(result);
         }
@@ -125,7 +126,7 @@ function onConnection(socket) {
 
       if (result.team.length === 0) {
         console.log(`All clients of room '${currentRoom}' disconnected, deleting the room`);
-        result = null;
+        result = defaultState;
         redis.del(currentRoom);
       } else {
         redis.set(currentRoom, JSON.stringify(result));
