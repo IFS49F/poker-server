@@ -17,6 +17,23 @@ const defaultState = {
   show: false
 };
 
+function getResultWithoutScores(result) {
+  if (!result) { return defaultState; }
+
+  /*
+  * For players who just joined or player, if `Show` has been
+  * clicked already, they should also see others' scores.
+  */
+  if (result.show) { return result; }
+
+  let { team, show } = result;
+
+  return {
+    team: team.map(player => Object.assign({}, player, { score: null })),
+    show
+  };
+}
+
 function onConnection(socket) {
   console.log(`Client '${socket.id}' connected`);
 
@@ -37,7 +54,7 @@ function onConnection(socket) {
         }
 
         redis.set(currentRoom, JSON.stringify(result));
-        io.in(currentRoom).emit('stateUpdate', result);
+        io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
       });
     });
   });
@@ -58,7 +75,7 @@ function onConnection(socket) {
       });
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 
@@ -76,7 +93,7 @@ function onConnection(socket) {
       votingPlayer.voted = true;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 
@@ -132,7 +149,7 @@ function onConnection(socket) {
         redis.set(currentRoom, JSON.stringify(result));
       }
 
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 }
