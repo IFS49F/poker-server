@@ -127,6 +127,8 @@ function onConnection(socket) {
       result.show = false;
 
       redis.set(currentRoom, JSON.stringify(result));
+      // the boolean is used for clients to indicate it's clear action,
+      // then the local state `myScore` could be cleared.
       io.in(currentRoom).emit('stateUpdate', result, true);
     });
   });
