@@ -127,7 +127,7 @@ function onConnection(socket) {
       result.show = false;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', result, true);
     });
   });
 
