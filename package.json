@@ -2,7 +2,7 @@
   "name": "poker-server",
   "version": "1.0.0",
   "description": "server for poker",
-  "repository": "IFS49F/poker-server.git",
+  "repository": "IFS49F/poker-server",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
