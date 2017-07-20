@@ -1,7 +1,7 @@
 {
   "name": "poker-server",
   "version": "1.0.0",
-  "description": "server for poker",
+  "description": "Server for Scrum Poker",
   "repository": "IFS49F/poker-server",
   "main": "index.js",
   "scripts": {

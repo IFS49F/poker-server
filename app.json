@@ -1,0 +1,6 @@
+{
+  "name": "poker-server",
+  "description": "Server for Scrum Poker",
+  "repository": "https://github.com/IFS49F/poker-server",
+  "keywords": ["dev-tool", "scrum", "socket.io", "node"]
+}
