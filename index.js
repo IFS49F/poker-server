@@ -17,6 +17,23 @@ const defaultState = {
   show: false
 };
 
+function getResultWithoutScores(result) {
+  if (!result) { return defaultState; }
+
+  /*
+  * For players who just joined or player, if `Show` has been
+  * clicked already, they should also see others' scores.
+  */
+  if (result.show) { return result; }
+
+  let { team, show } = result;
+
+  return {
+    team: team.map(player => Object.assign({}, player, { score: null })),
+    show
+  };
+}
+
 function onConnection(socket) {
   console.log(`Client '${socket.id}' connected`);
 
@@ -37,7 +54,7 @@ function onConnection(socket) {
         }
 
         redis.set(currentRoom, JSON.stringify(result));
-        io.in(currentRoom).emit('stateUpdate', result);
+        io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
       });
     });
   });
@@ -58,7 +75,7 @@ function onConnection(socket) {
       });
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 
@@ -76,11 +93,11 @@ function onConnection(socket) {
       votingPlayer.voted = true;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 
-  socket.on('show', (show) => {
+  socket.on('show', () => {
     redis.get(currentRoom, (err, result) => {
       if (!result) { return; }
 
@@ -88,14 +105,14 @@ function onConnection(socket) {
 
       console.log(`Client '${socket.id}' of room '${currentRoom}' showed the result`);
 
-      result.show = show;
+      result.show = true;
 
       redis.set(currentRoom, JSON.stringify(result));
       io.in(currentRoom).emit('stateUpdate', result);
     });
   });
 
-  socket.on('clear', (show) => {
+  socket.on('clear', () => {
     redis.get(currentRoom, (err, result) => {
       if (!result) { return; }
 
@@ -110,7 +127,9 @@ function onConnection(socket) {
       result.show = false;
 
       redis.set(currentRoom, JSON.stringify(result));
-      io.in(currentRoom).emit('stateUpdate', result);
+      // the boolean is used for clients to indicate it's clear action,
+      // then the local state `myScore` could be cleared.
+      io.in(currentRoom).emit('stateUpdate', result, true);
     });
   });
 
@@ -132,7 +151,7 @@ function onConnection(socket) {
         redis.set(currentRoom, JSON.stringify(result));
       }
 
-      io.in(currentRoom).emit('stateUpdate', result);
+      socket.to(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
     });
   });
 }
