@@ -3,10 +3,14 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const Redis = require('ioredis');
+const cors = require("cors");
 const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const port = process.env.PORT || 4000;
 
 app.use(express.static(__dirname + '/public'));
+
+const corsOptions = { origin: 'https://ifs49f-poker.surge.sh', optionsSuccessStatus: 200 };
+app.use(cors(corsOptions));
 
 const ts = new Date().getTime();
 const redis = new Redis(redisUrl, {
