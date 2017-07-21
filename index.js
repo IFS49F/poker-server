@@ -1,7 +1,12 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const clientOrigin = process.env.CLIENT_ORIGIN || '*';
+const io = require('socket.io')(http, {
+  origins: clientOrigin,
+  pingInterval: 5000,
+  pingTimeout: 15000
+});
 const Redis = require('ioredis');
 const cors = require("cors");
 const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
@@ -9,7 +14,7 @@ const port = process.env.PORT || 4000;
 
 app.use(express.static(__dirname + '/public'));
 
-const corsOptions = { origin: 'https://ifs49f-poker.surge.sh', optionsSuccessStatus: 200 };
+const corsOptions = { origin: clientOrigin, optionsSuccessStatus: 200 };
 app.use(cors(corsOptions));
 
 const ts = new Date().getTime();
