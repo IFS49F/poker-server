@@ -1,0 +1,14 @@
+{
+  "name": "poker",
+  "script": "index.js",
+  "cwd": "/websites/poker-server/current",
+  "pid_file": "/websites/poker-server/pids/acl.pid",
+  "error_file": "/websites/poker-server/logs/pm2.log",
+  "out_file": "/websites/poker-server/logs/pm2.log",
+  "log_date_format" : "YYYY-MM-DD HH:mm Z",
+  "merge_logs": true,
+  "watch": false,
+  "env_production": {
+    "NODE_ENV": "production"
+  }
+}
