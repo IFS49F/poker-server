@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const clientOrigin = process.env.CLIENT_ORIGIN || '*';
+console.log('origin: ' + process.env.CLIENT_ORIGIN);
 const io = require('socket.io')(http, {
   origins: clientOrigin,
   pingInterval: 5000,

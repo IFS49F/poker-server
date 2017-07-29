@@ -6,7 +6,7 @@ const config = {
     keepReleases: 2,
     deleteOnRollback: false,
     shallowClone: true,
-    rsync: ['-R'],
+    rsync: ['--delete'],
     ignores: [
       '.gitkeep',
       '.git',
