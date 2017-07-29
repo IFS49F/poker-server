@@ -5,7 +5,7 @@ const config = {
     repositoryUrl: 'git@github.com:IFS49F/poker-server.git',
     keepReleases: 2,
     deleteOnRollback: false,
-    key: '~/poker_deploy_key',
+    key: './poker_server_deploy_key',
     shallowClone: true,
     rsync: ['-R'],
     ignores: [
