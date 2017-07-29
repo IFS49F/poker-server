@@ -5,7 +5,6 @@ const config = {
     repositoryUrl: 'git@github.com:IFS49F/poker-server.git',
     keepReleases: 2,
     deleteOnRollback: false,
-    key: '.ssh/deploy_key',
     shallowClone: true,
     rsync: ['-R'],
     ignores: [
@@ -29,6 +28,10 @@ module.exports = shipit => {
   shipit.initConfig(config);
 
   shipit.on('deployed', () => {
+    shipit.remoteCopy('./pm2.json', `${shipit.config.deployTo}/current`).then(() => shipit.start('restart'));
+  });
+
+  shipit.task('restart', () => {
     const pm2Json = 'pm2.json';
     shipit.remote(`
       cd ${shipit.config.deployTo}/current;
