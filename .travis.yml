@@ -16,7 +16,7 @@ addons:
 
 before_script:
   - openssl aes-256-cbc -K $encrypted_ce2eceff5e82_key -iv $encrypted_ce2eceff5e82_iv
-    -in deploy_key.enc -out ~\/poker_server_deploy_key -d
+    -in deploy_key.enc -out poker_server_deploy_key -d
 
 script:
   # - npm run test
