@@ -31,4 +31,4 @@ deploy:
   - provider: script
     script: shipit production deploy
     on:
-      all_branches: true
+      branch: travis-shipit-pm2
