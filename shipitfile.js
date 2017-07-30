@@ -3,6 +3,7 @@ const config = {
     workspace: './tmp',
     deployTo: '/websites/poker-server',
     repositoryUrl: 'git@github.com:IFS49F/poker-server.git',
+    branch: process.env.TRAVIS_BRANCH || 'master',
     keepReleases: 2,
     deleteOnRollback: false,
     shallowClone: true,

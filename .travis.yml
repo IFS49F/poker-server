@@ -27,5 +27,8 @@ before_script:
 script:
   # - npm run test
 
-after_success:
-  - shipit production deploy
+deploy:
+  - provider: script
+    script: shipit production deploy
+    on:
+      all_branches: true
