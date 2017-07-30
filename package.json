@@ -18,10 +18,10 @@
   "dependencies": {
     "express": "^4.15.3",
     "ioredis": "^3.1.1",
-    "socket.io": "^2.0.3",
-    "shipit-deploy": "^2.5.1"
+    "socket.io": "^2.0.3"
   },
   "devDependencies": {
+    "shipit-deploy": "^2.5.1",
     "nodemon": "^1.11.0"
   }
 }
