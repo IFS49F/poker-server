@@ -4,6 +4,7 @@ const http = require('http').Server(app);
 const clientOrigin = process.env.CLIENT_ORIGIN || '*:*';
 const io = require('socket.io')(http, {
   origins: clientOrigin,
+  serveClient: false,
   pingInterval: 5000,
   pingTimeout: 15000
 });
