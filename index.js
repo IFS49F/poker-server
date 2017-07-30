@@ -1,12 +1,7 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-<<<<<<< Updated upstream
-const clientOrigin = process.env.CLIENT_ORIGIN || '*';
-console.log('origin: ' + process.env.CLIENT_ORIGIN);
-=======
 const clientOrigin = process.env.CLIENT_ORIGIN || '*:*';
->>>>>>> Stashed changes
 const io = require('socket.io')(http, {
   origins: clientOrigin,
   pingInterval: 5000,
