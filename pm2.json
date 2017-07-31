@@ -2,7 +2,7 @@
   "name": "poker",
   "script": "index.js",
   "cwd": "/websites/poker-server/current",
-  "pid_file": "/websites/poker-server/pids/acl.pid",
+  "pid_file": "/websites/poker-server/pids/poker.pid",
   "error_file": "/websites/poker-server/logs/pm2.log",
   "out_file": "/websites/poker-server/logs/pm2.log",
   "log_date_format" : "YYYY-MM-DD HH:mm Z",
