@@ -3,20 +3,28 @@ const defaultState = {
   team: [],
   show: false
 };
-const getResultWithoutScores = (result) => {
+// sometime if we want to show how many observers there
+// are in current room to clients, this filter is not needed.
+const filterObservers = (result) => {
   if (!result) { return defaultState; }
-  /*
-  * For players who just joined or player, if `Show` has been
-  * clicked already, they should also see others' scores.
-  */
-  if (result.show) { return result; }
 
   let { team, show } = result;
   return {
-    team: team.map(player => Object.assign({}, player, { score: null })),
+    team: team.filter(player => player.name),
     show
   };
-}
+};
+const filterScores = (result) => {
+  if (!result) { return defaultState; }
+  // scores should not be filtered if `show` is true
+  if (result.show) { return filterObservers(result); }
+
+  let { team, show } = result;
+  return filterObservers({
+    team: team.map(player => Object.assign({}, player, { score: null })),
+    show
+  });
+};
 
 module.exports = (socket, io) => {
   console.log(`Client '${socket.id}' connected`);
@@ -32,8 +40,19 @@ module.exports = (socket, io) => {
           console.log(`New room '${currentRoom}' created`);
           result = defaultState;
         }
+        // we should also store observer into redis, otherwise
+        // if the unique player quit, the observer can not play
+        // since the room has been deleted.
+        result.team.push({
+          id: socket.id,
+          // if there is no name, that says he/she is observer.
+          name: null,
+          score: null,
+          voted: false
+        });
+
         redis.set(currentRoom, result);
-        io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+        io.in(currentRoom).emit('stateUpdate', filterScores(result));
       });
     });
   });
@@ -43,15 +62,11 @@ module.exports = (socket, io) => {
       if (!result) { return; }
 
       console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${playerName}'`);
-      result.team.push({
-        id: socket.id,
-        name: playerName,
-        score: null,
-        voted: false
-      });
+      let player = result.team.find(item => item.id === socket.id);
+      player.name = playerName;
 
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      io.in(currentRoom).emit('stateUpdate', filterScores(result));
     });
   });
 
@@ -65,7 +80,7 @@ module.exports = (socket, io) => {
       votingPlayer.voted = true;
 
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      io.in(currentRoom).emit('stateUpdate', filterScores(result));
     });
   });
 
@@ -77,7 +92,7 @@ module.exports = (socket, io) => {
       result.show = true;
 
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', filterObservers(result));
     });
   });
 
@@ -95,7 +110,7 @@ module.exports = (socket, io) => {
       redis.set(currentRoom, result);
       // the boolean is used for clients to indicate it's clear action,
       // then the local state `myScore` could be cleared.
-      io.in(currentRoom).emit('stateUpdate', result, true);
+      io.in(currentRoom).emit('stateUpdate', filterObservers(result), true);
     });
   });
 
@@ -113,7 +128,7 @@ module.exports = (socket, io) => {
         redis.set(currentRoom, result);
       }
 
-      socket.to(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      socket.to(currentRoom).emit('stateUpdate', filterScores(result));
     });
   });
 }
