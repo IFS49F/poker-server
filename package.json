@@ -5,7 +5,8 @@
   "repository": "IFS49F/poker-server",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "test": "mocha --recursive ./tests"
   },
   "engines": {
     "node": ">=6.0.0"
@@ -21,7 +22,10 @@
     "socket.io": "^2.0.3"
   },
   "devDependencies": {
-    "shipit-deploy": "^2.5.1",
-    "nodemon": "^1.11.0"
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "nodemon": "^1.11.0",
+    "proxyquire": "^1.8.0",
+    "shipit-deploy": "^2.5.1"
   }
 }
