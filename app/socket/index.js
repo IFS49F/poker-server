@@ -105,7 +105,8 @@ module.exports = (socket, io) => {
 
       console.log(`Client '${socket.id}' of room '${currentRoom}' disconnected`);
       result.team = result.team.filter(item => item.id !== socket.id);
-      if (result.team.length === 0) {
+
+      if (!io.sockets.adapter.rooms[currentRoom]) {
         console.log(`All clients of room '${currentRoom}' disconnected, deleting the room`);
         result = defaultState;
         redis.del(currentRoom);
