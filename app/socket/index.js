@@ -16,7 +16,19 @@ const getResultWithoutScores = (result) => {
     team: team.map(player => Object.assign({}, player, { score: null })),
     show
   };
-}
+};
+
+const isRoomEmpty = (io, currentRoom) => {
+  // the doc for socket.io sucks, just found the answer on
+  // https://stackoverflow.com/a/35527764/2798001
+  //
+  // io.sockets.adapter.rooms[room].length: All connected clients in specific room
+  // Object.keys(io.sockets.connected).length: All connected clients
+  //
+  // if there are no any connections in specific room, io.sockets.adapter.rooms[room]
+  // will be `undefined`.
+  return !io.sockets.adapter.rooms[currentRoom];
+};
 
 module.exports = (socket, io) => {
   console.log(`Client '${socket.id}' connected`);
@@ -105,7 +117,8 @@ module.exports = (socket, io) => {
 
       console.log(`Client '${socket.id}' of room '${currentRoom}' disconnected`);
       result.team = result.team.filter(item => item.id !== socket.id);
-      if (result.team.length === 0) {
+
+      if (isRoomEmpty(io, currentRoom)) {
         console.log(`All clients of room '${currentRoom}' disconnected, deleting the room`);
         result = defaultState;
         redis.del(currentRoom);
