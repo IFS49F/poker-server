@@ -20,7 +20,7 @@ before_script:
   - ssh-add ~/.ssh/deploy_key
 
 script:
-  # - npm run test
+  - npm run test
 
 deploy:
   - provider: script
