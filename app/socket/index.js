@@ -34,7 +34,7 @@ module.exports = (socket, io) => {
   console.log(`Client '${socket.id}' connected`);
   let currentRoom = null;
 
-  socket.on('join', (room, playerName) => {
+  socket.on('join', (room) => {
     console.log(`Client '${socket.id}' joined room '${room}'`);
     currentRoom = room;
 
@@ -50,17 +50,16 @@ module.exports = (socket, io) => {
     });
   });
 
-  socket.on('play', (playerName) => {
+  socket.on('play', (player) => {
     redis.get(currentRoom).then(result => {
       if (!result) { return; }
 
-      console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${playerName}'`);
-      result.team.push({
+      console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${player.name}'`);
+      result.team.push(Object.assign(player, {
         id: socket.id,
-        name: playerName,
         score: null,
         voted: false
-      });
+      }));
 
       redis.set(currentRoom, result);
       io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
