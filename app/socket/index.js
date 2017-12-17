@@ -75,8 +75,13 @@ module.exports = (socket, io) => {
       votingPlayer.score = score;
       votingPlayer.voted = true;
 
+      const action = {
+        type: 'vote',
+        playerId: votingPlayer.id
+      };
+
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      io.in(currentRoom).emit('stateUpdate', { ...getResultWithoutScores(result), action });
     });
   });
 
@@ -87,8 +92,13 @@ module.exports = (socket, io) => {
       console.log(`Client '${socket.id}' of room '${currentRoom}' showed the result`);
       result.show = true;
 
+      const action = {
+        type: 'show',
+        playerId: socket.id
+      };
+
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', { ...result, action });
     });
   });
 
@@ -103,10 +113,15 @@ module.exports = (socket, io) => {
       });
       result.show = false;
 
+      const action = {
+        type: 'clear',
+        playerId: socket.id
+      };
+
       redis.set(currentRoom, result);
       // the boolean is used for clients to indicate it's clear action,
       // then the local state `myScore` could be cleared.
-      io.in(currentRoom).emit('stateUpdate', result, true);
+      io.in(currentRoom).emit('stateUpdate', { ...result, action }, true);
     });
   });
 
