@@ -18,7 +18,7 @@ const config = {
     ]
   },
   production: {
-    servers: 'deploy@poker4.fun'
+    servers: 'deploy@poker4.fun:9527'
   }
 };
 
