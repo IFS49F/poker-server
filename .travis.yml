@@ -7,7 +7,7 @@ node_js:
 cache: yarn
 
 addons:
-  ssh_known_hosts: poker4.fun
+  ssh_known_hosts: poker4.fun:$SSH_PORT
 
 before_install:
   - yarn global add shipit-cli
