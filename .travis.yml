@@ -6,9 +6,6 @@ node_js:
   - 6
 cache: yarn
 
-addons:
-  ssh_known_hosts: poker4.fun:$SSH_PORT
-
 before_install:
   - yarn global add shipit-cli
 
@@ -18,6 +15,7 @@ before_script:
   - chmod 600 ~/.ssh/deploy_key
   - eval "$(ssh-agent -s)"
   - ssh-add ~/.ssh/deploy_key
+  - ssh-keyscan -p $SSH_PORT poker4.fun >> ~/.ssh/known_hosts
 
 script:
   - npm run test
