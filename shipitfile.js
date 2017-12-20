@@ -18,7 +18,11 @@ const config = {
     ]
   },
   production: {
-    servers: 'deploy@poker4.fun:9527'
+    servers: [{
+      user: 'deploy',
+      host: 'poker4.fun',
+      port: process.env.SSH_PORT || 22
+    }]
   }
 };
 
