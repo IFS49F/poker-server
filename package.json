@@ -9,7 +9,7 @@
     "test": "mocha --recursive ./tests"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.3.0"
   },
   "keywords": [
     "poker"
