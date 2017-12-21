@@ -26,7 +26,6 @@
     "mocha": "^3.5.0",
     "nodemon": "^1.11.0",
     "proxyquire": "^1.8.0",
-    "shipit-deploy": "^2.5.1",
-    "shipit-nvm": "^0.0.6"
+    "shipit-deploy": "^2.5.1"
   }
 }
