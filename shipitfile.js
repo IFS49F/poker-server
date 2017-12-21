@@ -15,7 +15,10 @@ const config = {
       'shipitfile.js',
       'node_modules',
       'tmp'
-    ]
+    ],
+    nvm: {
+      sh: '~/.nvm/nvm.sh'
+    }
   },
   production: {
     servers: [{
@@ -28,6 +31,7 @@ const config = {
 
 module.exports = shipit => {
   require('shipit-deploy')(shipit);
+  require('shipit-nvm')(shipit);
 
   shipit.initConfig(config);
 
