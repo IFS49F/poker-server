@@ -34,7 +34,7 @@ module.exports = (socket, io) => {
   console.log(`Client '${socket.id}' connected`);
   let currentRoom = null;
 
-  socket.on('join', (room, playerName) => {
+  socket.on('join', (room) => {
     console.log(`Client '${socket.id}' joined room '${room}'`);
     currentRoom = room;
 
@@ -50,17 +50,16 @@ module.exports = (socket, io) => {
     });
   });
 
-  socket.on('play', (playerName) => {
+  socket.on('play', (player) => {
     redis.get(currentRoom).then(result => {
       if (!result) { return; }
 
-      console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${playerName}'`);
-      result.team.push({
+      console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${player.name}'`);
+      result.team.push(Object.assign(player, {
         id: socket.id,
-        name: playerName,
         score: null,
         voted: false
-      });
+      }));
 
       redis.set(currentRoom, result);
       io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
@@ -76,8 +75,13 @@ module.exports = (socket, io) => {
       votingPlayer.score = score;
       votingPlayer.voted = true;
 
+      const action = {
+        type: 'vote',
+        playerId: votingPlayer.id
+      };
+
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', getResultWithoutScores(result));
+      io.in(currentRoom).emit('stateUpdate', { ...getResultWithoutScores(result), action });
     });
   });
 
@@ -88,8 +92,13 @@ module.exports = (socket, io) => {
       console.log(`Client '${socket.id}' of room '${currentRoom}' showed the result`);
       result.show = true;
 
+      const action = {
+        type: 'show',
+        playerId: socket.id
+      };
+
       redis.set(currentRoom, result);
-      io.in(currentRoom).emit('stateUpdate', result);
+      io.in(currentRoom).emit('stateUpdate', { ...result, action });
     });
   });
 
@@ -104,10 +113,15 @@ module.exports = (socket, io) => {
       });
       result.show = false;
 
+      const action = {
+        type: 'clear',
+        playerId: socket.id
+      };
+
       redis.set(currentRoom, result);
       // the boolean is used for clients to indicate it's clear action,
       // then the local state `myScore` could be cleared.
-      io.in(currentRoom).emit('stateUpdate', result, true);
+      io.in(currentRoom).emit('stateUpdate', { ...result, action }, true);
     });
   });
 
