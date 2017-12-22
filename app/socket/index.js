@@ -54,6 +54,7 @@ module.exports = (socket, io) => {
     redis.get(currentRoom).then(result => {
       if (!result) { return; }
 
+      if (typeof player !== 'object') player = { name: player };
       console.log(`Client '${socket.id}' starts playing in room '${currentRoom}' under the name '${player.name}'`);
       result.team.push(Object.assign(player, {
         id: socket.id,
