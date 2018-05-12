@@ -34,9 +34,9 @@ module.exports = (socket, io) => {
   console.log(`Client '${socket.id}' connected`);
   let currentRoom = null;
 
-  socket.on('join', (room) => {
-    console.log(`Client '${socket.id}' joined room '${room}'`);
-    currentRoom = room;
+  socket.on('join', (room = '') => {
+    currentRoom = room.toLowerCase();
+    console.log(`Client '${socket.id}' joined room '${currentRoom}'`);
 
     socket.join(currentRoom, () => {
       redis.get(currentRoom).then(result => {
