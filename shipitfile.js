@@ -7,6 +7,7 @@ const config = {
     deleteOnRollback: false,
     shallowClone: true,
     rsync: ['--delete'],
+    branch: 'master',
     ignores: [
       '.gitkeep',
       '.git',
