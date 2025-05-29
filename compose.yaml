@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    environment:
+      - PORT=4300
+      - REDIS_URL=redis://redis:6379
+      # - CLIENT_ORIGIN=https://poker4fun.jshih.dev
+    ports:
+      - 4300:4300
+    restart: unless-stopped
+    develop:
+      watch: 
+        - path: app
+          action: rebuild
+  
+  redis:
+    image: redis:8.0.1
+    restart: unless-stopped
