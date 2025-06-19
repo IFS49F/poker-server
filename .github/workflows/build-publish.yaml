@@ -7,7 +7,7 @@ on:
       - "v*"
 
 env:
-  TARGET_PLATFORMS: linux/arm64
+  TARGET_PLATFORMS: linux/arm64,linux/amd64
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
