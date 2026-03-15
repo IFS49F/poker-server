@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Server for Scrum Poker",
   "repository": "IFS49F/poker-server",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
