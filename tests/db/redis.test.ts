@@ -1,23 +1,21 @@
 import { describe, it, expect, vi } from 'vitest'
+import redis from '../../src/db/redis'
 
 vi.mock('ioredis', () => {
-  const MockRedis = vi.fn().mockImplementation(() => ({
+  class MockRedis {
     get(key: string) {
       if (key === 'noResults') { return Promise.resolve(null) }
       return Promise.resolve(JSON.stringify({ team: [], show: false }))
-    },
+    }
     set(_key: string, value: string) {
       return Promise.resolve(value)
-    },
+    }
     del(key: string) {
       return Promise.resolve(key)
     }
-  }))
+  }
   return { default: MockRedis }
 })
-
-// imported after vi.mock so the mock is in place
-const { default: redis } = await import('../../src/db/redis')
 
 describe('db/redis', () => {
   describe('redis.get', () => {
